@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <windows.h>
+
 
 const std::string plot_program = "pyfiles/plotter.py";
 const std::string newton_program = "pyfiles/newtoncheck.py";

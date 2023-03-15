@@ -15,7 +15,7 @@ std::vector<double> linspace(double start, double end, size_t count)
 void plot_graph(double func(double), double begin, double end, size_t pts_count)
 {
     std::stringstream command;
-    command << "python " << plot_program << ' ' << begin << " " << end << " ";
+    command << "start cmd.exe @cmd /k python " << plot_program << ' ' << begin << " " << end << " ";
     
     std::vector<double> vals(pts_count);
     auto x = linspace(begin, end, pts_count);
@@ -27,7 +27,13 @@ void plot_graph(double func(double), double begin, double end, size_t pts_count)
     }
 
     //Calculated ordinates are exported to python script to plot
+    #undef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0500
+    HWND hwnd = GetConsoleWindow();
+
     system(command.str().c_str());
+    Sleep(2000);
+    SetForegroundWindow(hwnd);
 }
 
 void newton(double x0, double eps)

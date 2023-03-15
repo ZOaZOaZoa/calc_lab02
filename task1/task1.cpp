@@ -4,6 +4,7 @@
 #include <vector>
 #include <math.h>
 
+
 #include "func.h"
 
 const double BEGIN = -3;
@@ -20,6 +21,7 @@ double f(double x)
 int main()
 {
     //Calling python script to draw a plot
+    
     plot_graph(f, BEGIN, END, COUNT);
 
     std::cout << "Enter x0: ";
