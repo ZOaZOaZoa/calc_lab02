@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <math.h>
+#include <conio.h>
 
 
 #include "func.h"
@@ -24,14 +25,16 @@ int main()
     
     plot_graph(f, BEGIN, END, COUNT);
 
-    std::cout << "Enter x0: ";
+    std::cerr << "Enter x0: ";
     double x0;
     std::cin >> x0;
-    std::cout << "Enter eps: ";
+    std::cerr << "Enter eps: ";
     double eps;
     std::cin >> eps;
 
     newton(x0, eps);
+
+    getch();
 
 
     return 0;
