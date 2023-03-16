@@ -1,17 +1,14 @@
 #include <math.h>
 #include <iostream>
 #include <iomanip>
+#include <conio.h>
 
 #include "../task1/func.h"
-
-double f(double x);
-double g(double x);
 
 const size_t COUNT = 30;
 const size_t MAX_STEPS = 1000;
 std::string py_prog = "pyfiles/root.py";
-double (*func)(double) = g;
-const char funcLabel_PY = 'g';
+
 
 double f(double x)
 {
@@ -27,6 +24,30 @@ int main()
 {
     double a, b, eps, root, python_root;
 
+    double (*func)(double);
+    char funcLabel_PY;
+    char ans;
+    std::cerr << "What func to use? f or g: ";
+    std::cin >> ans;
+
+    //Choose function to analys
+    if(ans == 'f')
+    {
+        func = f;
+        funcLabel_PY = 'f';
+    }
+    else if (ans == 'g')
+    {
+        func = g;
+        funcLabel_PY = 'g';
+    }
+    else
+    {
+        std::cerr << "Wrong input\n";
+        return 0;
+    }
+
+    //Input segment of localisation to work with
     std::cerr << "Enter a: ";
     std::cin >> a;
     std::cerr << "Enter b: ";
@@ -37,6 +58,7 @@ int main()
     std::cerr << "Enter eps: ";
     std::cin >> eps;
 
+    //In converged will be saved info about convergance of method
     bool converged;
     size_t steps;
 
@@ -45,13 +67,17 @@ int main()
     std::cout << "Method converged: " << converged << '\n';
     std::cout << "Result: x = " << std::setprecision(15) << root << ", steps = " << steps << '\n';
 
+    //Input for python method
     double x0;
     std::cerr << "Enter x0 for python root(): ";
     std:: cin >> x0;
 
+    //Call a python root()
     std::stringstream command;
     command << "python " << py_prog << ' ' << x0 << ' ' << funcLabel_PY;
     system(command.str().c_str());
+
+    getch();
 
     return 0;
 }

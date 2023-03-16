@@ -1,0 +1,1 @@
+program_2.exe < task2/input1.txt 2> NUL

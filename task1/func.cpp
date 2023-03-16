@@ -12,7 +12,7 @@ std::vector<double> linspace(double start, double end, size_t count)
     return res;
 }
 
-void plot_graph(double func(double), double begin, double end, size_t pts_count)
+void plot_graph(double func(double), double begin, double end, size_t pts_count, std::string* title)
 {
     std::stringstream command;
     command << "start cmd.exe @cmd /k python " << plot_program << ' ' << begin << " " << end << " ";
@@ -20,21 +20,23 @@ void plot_graph(double func(double), double begin, double end, size_t pts_count)
     std::vector<double> vals(pts_count);
     auto x = linspace(begin, end, pts_count);
 
+    if ( title != nullptr) 
+    {
+        command << " \"" << *title << "\" ";
+    } 
+    else
+    {
+        command << " _ ";
+    }
+
     for(int i = 0; i < x.size(); i++)
     {
         vals[i] = func(x[i]);
         command << vals[i] << ' ';
     }
-
-    //Used to bring main console window to front by SetForegroundWindow()
-    #undef _WIN32_WINNT
-    #define _WIN32_WINNT 0x0500
-    HWND hwnd = GetConsoleWindow();
-
+    
     //Calculated ordinates are exported to python script to plot
     system(command.str().c_str());
-    Sleep(2000);
-    SetForegroundWindow(hwnd);
 }
 
 void newton(double x0, double eps)
@@ -68,10 +70,9 @@ double bisection(double f(double), double left, double right, double eps, bool& 
 
     size_t n = 1;
     bool end_cond = false;
+    double end_const = 2*eps;
     do
     {
-        
-        //negator*f(x[n-1]) < 0 ? left = x[n-1] : right = x[n-1];
         if(negator*f(x[n-1]) < 0)
         {
             left = x[n-1];
@@ -88,11 +89,10 @@ double bisection(double f(double), double left, double right, double eps, bool& 
             break;
         }
 
-        //std::cout << "step: " << n << " x: " << x[n] << '\n';
 
-        end_cond = (right-left)<2*eps;
+        end_cond = (right-left)<end_const;
 
-    } while ( !end_cond && ++n < max_iter);
+    } while ( !end_cond & ++n < max_iter);
 
     if(end_cond)
     {
@@ -100,5 +100,76 @@ double bisection(double f(double), double left, double right, double eps, bool& 
     }
 
     *steps = n-1;
+    return x[n-1];
+}
+
+double simple_iteration(double f(double), double f_prime(double), double x0, double x_prime_min, double x_prime_max, double eps, bool* converged, bool prompt, size_t max_iter)
+{
+
+    double m, M, alpha, q;
+
+    m = f_prime(x_prime_min);
+    M = f_prime(x_prime_max);
+
+    if (m*M<=0)
+    {
+        *converged = false;
+        return 0;
+    }
+
+    //Negates function to work with positive derivative
+    int negator = 1;
+    if (m < 0)
+    {
+        negator = -1;
+    }
+
+    m *= negator;
+    M *= negator;
+
+    alpha = 2/(m+M);
+    q = (M-m)/(m+M);
+
+    if(prompt)
+    {
+        std::cout << "m = " << m << ", M = " << M << ", alpha = " << alpha << " q = " << q << '\n';
+    }
+
+    std::vector<double> x(max_iter);
+    x[0] = x0;
+
+    int n = 1;
+    bool end_cond = false;
+    double end_const = (1-q)/q * eps;
+    if(prompt)
+    {
+        std::cout << "n\t" << std::setw(20) << "x_n" << std::setw(15) << "decreased in\n";
+    }
+    do
+    {
+        x[n] = x[n-1] - alpha*negator*f(x[n-1]);
+
+        if(prompt)
+        {
+            std::cout << n << '\t' << std::setw(20) << std::setprecision(15) << x[n];
+        }
+        if(prompt && n > 1)
+        {
+            double decrease_coeff = abs(x[n] - x[n-1]) / abs(x[n-1] - x[n-2]);
+            std::cout << std::setw(15) << std::setprecision(7) << decrease_coeff << '\n';
+        }
+        else
+        {
+            std::cout << '\n';
+        }
+
+        end_cond = abs(x[n] - x[n-1]) < end_const;
+    } while (!end_cond & ++n < max_iter);
+    
+    if (end_cond)
+    {
+        *converged = true;
+    }
+
     return x[n-1];
 }
