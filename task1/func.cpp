@@ -34,7 +34,7 @@ void plot_graph(double func(double), double begin, double end, size_t pts_count,
         vals[i] = func(x[i]);
         command << vals[i] << ' ';
     }
-    
+
     //Calculated ordinates are exported to python script to plot
     system(command.str().c_str());
 }
@@ -143,7 +143,7 @@ double simple_iteration(double f(double), double f_prime(double), double x0, dou
     double end_const = (1-q)/q * eps;
     if(prompt)
     {
-        std::cout << "n\t" << std::setw(20) << "x_n" << std::setw(15) << "decreased in\n";
+        std::cout << "n\t" << std::setw(20) << "x_n" << std::setw(17) << "Estimated delta" << std::setw(15) << "decreased in\n";
     }
     do
     {
@@ -155,8 +155,10 @@ double simple_iteration(double f(double), double f_prime(double), double x0, dou
         }
         if(prompt && n > 1)
         {
+            double delta = q/(1-q)*abs(x[n] - x[n-1]);
             double decrease_coeff = abs(x[n] - x[n-1]) / abs(x[n-1] - x[n-2]);
-            std::cout << std::setw(15) << std::setprecision(7) << decrease_coeff << '\n';
+            std::cout << std::setw(17) << std::scientific << std::setprecision(5) << delta;
+            std::cout << std::setw(15) << std::fixed << std::setprecision(7) << decrease_coeff << '\n';
         }
         else
         {
