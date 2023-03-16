@@ -1,5 +1,4 @@
 #include "func.h"
-#include <iostream>
 
 std::vector<double> linspace(double start, double end, size_t count)
 {
